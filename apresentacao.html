@@ -1510,15 +1510,14 @@ function sanitizeInput(userInput) {<br>
 
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            // Ignore if user is typing in an input field
+            // Skip if user is typing in input fields
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
                 return;
             }
             
             switch(e.key) {
+                case ' ': // Space key
                 case 'ArrowRight':
-                case ' ':
-                case 'Spacebar': // For older browsers
                     e.preventDefault();
                     nextStage();
                     break;
@@ -1536,18 +1535,6 @@ function sanitizeInput(userInput) {<br>
                     currentStage = totalStages - 1;
                     updateUI();
                     break;
-            }
-        });
-        
-        // Alternative keyup listener for space bar (some browsers handle it differently)
-        document.addEventListener('keyup', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
-                return;
-            }
-            
-            if (e.code === 'Space' || e.keyCode === 32) {
-                e.preventDefault();
-                nextStage();
             }
         });
 
