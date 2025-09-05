@@ -1,0 +1,45 @@
+# Prompt Profissional — **YouTube Comment Analyzer**
+
+> Use o texto abaixo diretamente no **Claude Code** para gerar a aplicação SaaS.  
+> O prompt já segue boas práticas de clareza, divisão de responsabilidades e orientação a resultados.
+
+---
+
+## 🎯 Objetivo  
+Crie um **Analisador de Comentários do YouTube** capaz de coletar, analisar e apresentar insights acionáveis a partir dos comentários de qualquer vídeo.
+
+## 🛠️ Funcionalidades Principais  
+
+1. **Entrada**  
+   - Aceitar um **URL de vídeo do YouTube** fornecido pelo usuário.
+
+2. **Coleta de Comentários**  
+   - Buscar **todos os comentários** disponíveis no vídeo.  
+   - Tratar paginação e limites da API para garantir cobertura completa.
+
+3. **Processamento com IA**  
+   - Executar **análise de sentimento** (positivo, negativo, neutro).  
+   - Extrair **Perguntas Frequentes (FAQs)** presentes nos comentários.  
+   - Gerar **Ideias de Conteúdo** baseadas em temas recorrentes.
+
+4. **Interface do Usuário (UI)**  
+   - Layout **limpo, intuitivo e responsivo** (desktop & mobile).  
+   - **Cores** inspiradas no YouTube: vermelho #FF0000, branco #FFFFFF, cinza #F2F2F2.  
+   - Exibir **indicadores de progresso** durante coleta/análise.  
+   - Linguagem **sem jargões técnicos**, voltada ao usuário final.  
+   - **Tempo de carregamento otimizado** (< 2 s na maioria dos casos).
+
+5. **Resultados**  
+   - Tabelas ou cards destacando FAQs, ideias de conteúdo e métricas de sentimento.  
+   - Opção de **exportar** o relatório em CSV/JSON.
+
+---
+
+## ⚙️ Instruções de Execução  
+
+1. **Clone** o repositório gerado ou abra o projeto no ambiente sugerido pelo Claude Code.  
+2. **Configuração de Variáveis de Ambiente:**  
+   ```env
+   YOUTUBE_API_KEY=<sua_chave_da_API_do_YouTube_Data_v3>
+   OPENAI_API_KEY=<sua_chave_para_modelos_de_LLM>
+   PORT=3000ß
