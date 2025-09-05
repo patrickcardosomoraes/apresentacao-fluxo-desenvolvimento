@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxo de Desenvolvimento - Hubia360</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #5B51E0;
+            --primary-light: #7c6df7;
+            --primary-dark: #453bc4;
+            --secondary: #f8fafc;
+            --accent: #06b6d4;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border: rgba(148, 163, 184, 0.2);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --gradient-primary: linear-gradient(135deg, #5B51E0 0%, #7c6df7 100%);
+            --gradient-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(91, 81, 224, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(91, 81, 224, 0.8); }
+        }
+
+        /* Main Container */
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stage-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .stage-number {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Stage Card */
+        .stage-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        .stage-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stage-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stage-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--white);
+            animation: pulse 2s infinite;
+        }
+
+        .stage-info h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .stage-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stage-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Tools Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .tool-card {
+            background: var(--gray-50);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .tool-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-emoji {
+            font-size: 2rem;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .tool-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tool-description {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .tool-features {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .tool-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Links */
+        .tool-links {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .tool-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tool-link:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .tool-link-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .tool-link-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        /* Insights */
+        .insights {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #3b82f6;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .insights-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .insights h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+
+        .insights p {
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navigation {
+            position: sticky;
+            bottom: 2rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 3rem;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--white);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--gray-50);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .nav-btn.primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(91, 81, 224, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Git Commands Copy Buttons */
+        .git-command {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .git-command:hover {
+            background-color: rgba(91, 81, 224, 0.05);
+        }
+
+        .copy-btn {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 6px;
+            color: var(--white);
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+            min-width: 32px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(91, 81, 224, 0.3);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Notification animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: var(--white);
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            animation: glow 1s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+
+            .progress-container {
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .main {
+                padding: 2rem 1rem;
+            }
+
+            .stage-card {
+                padding: 2rem;
+                border-radius: 16px;
+            }
+
+            .stage-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .fab {
+                bottom: 1rem;
+                right: 1rem;
+                width: 48px;
+                height: 48px;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Code styling */
+        code {
+            background: rgba(91, 81, 224, 0.1);
+            border: 1px solid rgba(91, 81, 224, 0.2);
+            border-radius: 4px;
+            padding: 0.125rem 0.25rem;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .tool-features li strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            z-index: 1000;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+    
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">Hubia360</div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="stage-indicator">
+                        <span>Etapa</span>
+                        <span class="stage-number" id="currentStageNumber">1</span>
+                        <span>de 4</span>
+                    </div>
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                    Fluxo de Desenvolvimento
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="hero">
+                <h1>Fluxo de Desenvolvimento</h1>
+                <p class="hero-subtitle">
+                    Do conceito à produção: uma jornada completa potencializada por IA e ferramentas modernas
+                </p>
+            </section>
+
+            <!-- Avisos Importantes e Dicas -->
+            <div class="stage-card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #f59e0b; margin-bottom: 3rem;">
+                <div class="stage-header">
+                    <div class="stage-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">⚠️</div>
+                    <div class="stage-info">
+                        <h2 style="color: #92400e;">Avisos Importantes e Dicas</h2>
+                        <p class="stage-description" style="color: #a16207;">Alinhando expectativas sobre Vibe Coding e IA</p>
+                        <p class="stage-subtitle" style="color: #a16207;">Leia antes de começar</p>
+                    </div>
+                </div>
+
+                <div class="tools-grid">
+                    <div class="tool-card" style="background: rgba(255, 255, 255, 0.8); border-color: #f59e0b;">
+                        <div class="tool-header">
+                            <div class="tool-emoji">🎯</div>
+                            <div class="tool-name" style="color: #92400e;">Expectativas Alinhadas</div>
+                        </div>
+                        <p class="tool-description" style="color: #a16207;">
+                            Sou um pouco leigo, mas mergulhei de cabeça para aprender sobre <strong>vibe coding</strong> e IA. A ideia é mostrar que uma pessoa que <strong>não é desenvolvedora</strong> consegue fazer algo interessante que pode ajudar no trabalho do dia a dia.
+                        </p>
+                        <ul class="tool-features">
+                            <li style="color: #a16207;"><strong>Não precisa ser expert</strong> - Qualquer um pode começar</li>
+                            <li style="color: #a16207;"><strong>Foco na prática</strong> - Aprender fazendo</li>
+                            <li style="color: #a16207;"><strong>Resultados reais</strong> - Soluções para o dia a dia</li>
+                        </ul>
+                    </div>
+
+                    <div class="tool-card" style="background: rgba(255, 255, 255, 0.8); border-color: #f59e0b;">
+                        <div class="tool-header">
+                            <div class="tool-emoji">⏳</div>
+                            <div class="tool-name" style="color: #92400e;">Paciência é Fundamental</div>
+                        </div>
+                        <p class="tool-description" style="color: #a16207;">
+                            Quem quer aprender sobre isso precisa ter <strong>muita paciência</strong>, porque <strong>dá muito pau</strong> e precisa sempre ir corrigindo. Faz parte do processo!
+                        </p>
+                        <ul class="tool-features">
+                            <li style="color: #a16207;"><strong>Erros são normais</strong> - Parte do aprendizado</li>
+                            <li style="color: #a16207;"><strong>Iteração constante</strong> - Testar, corrigir, repetir</li>
+                            <li style="color: #a16207;"><strong>Persistência</strong> - Não desistir no primeiro erro</li>
+                        </ul>
+                    </div>
+
+                    <div class="tool-card" style="background: rgba(255, 255, 255, 0.8); border-color: #f59e0b;">
+                        <div class="tool-header">
+                            <div class="tool-emoji">🛠️</div>
+                            <div class="tool-name" style="color: #92400e;">Ferramentas Essenciais</div>
+                        </div>
+                        <p class="tool-description" style="color: #a16207;">
+                            Você vai usar <strong>bastante</strong> o console do navegador, o terminal e a documentação da aplicação que irá integrar. Prepare-se!
+                        </p>
+                        <ul class="tool-features">
+                            <li style="color: #a16207;"><strong>Console do Navegador</strong> - Para debug e testes</li>
+                            <li style="color: #a16207;"><strong>Terminal</strong> - Comandos e instalações</li>
+                            <li style="color: #a16207;"><strong>Documentação</strong> - Sua melhor amiga</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="insights" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #f59e0b;">
+                    <div class="insights-icon">💡</div>
+                    <h3 style="color: #92400e;">Dica de Ouro</h3>
+                    <p style="color: #a16207;">
+                        <strong>Não tenha medo de errar!</strong> Cada erro é uma oportunidade de aprender algo novo. 
+                        O vibe coding é sobre experimentar, testar e iterar. Com paciência e prática, você vai ver 
+                        que é possível criar coisas incríveis mesmo sem ser um desenvolvedor experiente.
+                    </p>
+                </div>
+            </div>
+
+            <div id="stageContainer">
+                <!-- Stage 1: IA Aplicação Web -->
+                <div class="stage-card" id="stage-0">
+                    <div class="stage-header">
+                        <div class="stage-icon">🚀</div>
+                        <div class="stage-info">
+                            <h2>IA Aplicação Web</h2>
+                            <p class="stage-description">Criação e prototipagem assistida por inteligência artificial</p>
+                            <p class="stage-subtitle">Etapa 1 • Idealização e Desenvolvimento</p>
+                        </div>
+                    </div>
+
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🤖</div>
+                                <div class="tool-name">Lovable</div>
+                            </div>
+                            <p class="tool-description">
+                                Plataforma de desenvolvimento visual que transforma ideias em aplicações web funcionais através de IA
+                            </p>
+                            <ul class="tool-features">
+                                <li>Desenvolvimento visual drag-and-drop</li>
+                                <li>Geração automática de código</li>
+                                <li>Deploy instantâneo</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://lovable.dev" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Lovable ↗
+                                </a>
+                                <a href="https://docs.lovable.dev" target="_blank" class="tool-link">
+                                    Documentação
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">⚡</div>
+                                <div class="tool-name">Replit</div>
+                            </div>
+                            <p class="tool-description">
+                                Ambiente de desenvolvimento colaborativo na nuvem com IA integrada para programação em tempo real
+                            </p>
+                            <ul class="tool-features">
+                                <li>IDE na nuvem multiplataforma</li>
+                                <li>Colaboração em tempo real</li>
+                                <li>IA para assistência de código</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://replit.com" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Replit ↗
+                                </a>
+                                <a href="https://docs.replit.com" target="_blank" class="tool-link">
+                                    Guias
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">⚙️</div>
+                                <div class="tool-name">Bolt</div>
+                            </div>
+                            <p class="tool-description">
+                                Plataforma de deploy instantâneo e hospedagem simplificada para aplicações web modernas
+                            </p>
+                            <ul class="tool-features">
+                                <li>Deploy em um clique</li>
+                                <li>CDN global automático</li>
+                                <li>SSL gratuito</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://bolt.new" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Bolt ↗
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🧮</div>
+                                <div class="tool-name">Abacus.ai</div>
+                            </div>
+                            <p class="tool-description">
+                                Plataforma completa de IA para análise de dados, machine learning e automação inteligente
+                            </p>
+                            <ul class="tool-features">
+                                <li>AutoML sem código</li>
+                                <li>Análise preditiva</li>
+                                <li>APIs de ML prontas</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://abacus.ai" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Abacus ↗
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights">
+                        <div class="insights-icon">💡</div>
+                        <h3>Dica Pro</h3>
+                        <p>
+                            Comece sempre com ferramentas de IA para acelerar a prototipagem. Lovable permite criar MVPs funcionais em minutos, 
+                            Supabase fornece backend completo (banco + auth) gratuito, e Vercel faz deploy automático. 
+                            Esta stack permite criar aplicações completas em questão de horas, não dias.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stage 2: Hospedagem de Código -->
+                <div class="stage-card" id="stage-1" style="display: none;">
+                    <div class="stage-header">
+                        <div class="stage-icon">📚</div>
+                        <div class="stage-info">
+                            <h2>Hospedagem de Código</h2>
+                            <p class="stage-description">Controle de versão, colaboração e gestão de repositórios</p>
+                            <p class="stage-subtitle">Etapa 2 • Versionamento e Colaboração</p>
+                        </div>
+                    </div>
+
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🐙</div>
+                                <div class="tool-name">GitHub</div>
+                            </div>
+                            <p class="tool-description">
+                                Plataforma líder mundial para controle de versão Git, colaboração em código e DevOps
+                            </p>
+                            <ul class="tool-features">
+                                <li>Repositórios públicos/privados ilimitados</li>
+                                <li>Actions para CI/CD</li>
+                                <li>Code review e pull requests</li>
+                                <li>Issues e project management</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://github.com" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar GitHub ↗
+                                </a>
+                                <a href="https://docs.github.com" target="_blank" class="tool-link">
+                                    Documentação
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🔄</div>
+                                <div class="tool-name">GitHub Actions</div>
+                            </div>
+                            <p class="tool-description">
+                                Automação nativa do GitHub para CI/CD, testes automatizados e deploy contínuo
+                            </p>
+                            <ul class="tool-features">
+                                <li>Workflows personalizáveis</li>
+                                <li>Marketplace de actions</li>
+                                <li>Integração com cloud providers</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://github.com/features/actions" target="_blank" class="tool-link tool-link-primary">
+                                    GitHub Actions ↗
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">👥</div>
+                                <div class="tool-name">Colaboração GitHub</div>
+                            </div>
+                            <p class="tool-description">
+                                Ferramentas integradas para trabalho em equipe, code review e gestão de projetos
+                            </p>
+                            <ul class="tool-features">
+                                <li><strong>Fluxo de Colaboração:</strong></li>
+                                <li>Criar Issues para bugs/features</li>
+                                <li>Fork do repositório principal</li>
+                                <li>Criar Pull Request (PR)</li>
+                                <li>Code review e aprovações</li>
+                                <li>Merge para branch principal</li>
+                                <li>Branch protection rules</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://github.com/features" target="_blank" class="tool-link tool-link-primary">
+                                    Recursos GitHub ↗
+                                </a>
+                                <a href="https://docs.github.com/en/pull-requests" target="_blank" class="tool-link">
+                                    Pull Requests
+                                </a>
+                                <a href="https://docs.github.com/en/issues" target="_blank" class="tool-link">
+                                    Issues
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">⚡</div>
+                                <div class="tool-name">Comandos Git Essenciais</div>
+                            </div>
+                            <p class="tool-description">
+                                Principais comandos Git para controle de versão e fluxo de desenvolvimento
+                            </p>
+                            <ul class="tool-features">
+                                <li><strong>Configuração Inicial:</strong></li>
+                                <li class="git-command">
+                                     <code>git config --global user.name "Seu Nome"</code>
+                                     <button class="copy-btn" onclick="copyToClipboard('git config --global user.name &quot;Seu Nome&quot;')" title="Copiar comando">📋</button>
+                                 </li>
+                                 <li class="git-command">
+                                     <code>git config --global user.email "email@exemplo.com"</code>
+                                     <button class="copy-btn" onclick="copyToClipboard('git config --global user.email &quot;email@exemplo.com&quot;')" title="Copiar comando">📋</button>
+                                 </li>
+                                <li><strong>Comandos Básicos:</strong></li>
+                                <li class="git-command">
+                                    <code>git init</code> - Inicializar repositório
+                                    <button class="copy-btn" onclick="copyToClipboard('git init')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                    <code>git clone &lt;url&gt;</code> - Clonar repositório
+                                    <button class="copy-btn" onclick="copyToClipboard('git clone <url>')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                    <code>git add .</code> - Adicionar arquivos ao stage
+                                    <button class="copy-btn" onclick="copyToClipboard('git add .')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                     <code>git commit -m "mensagem"</code> - Fazer commit
+                                     <button class="copy-btn" onclick="copyToClipboard('git commit -m &quot;mensagem&quot;')" title="Copiar comando">📋</button>
+                                 </li>
+                                <li class="git-command">
+                                    <code>git push origin main</code> - Enviar para GitHub
+                                    <button class="copy-btn" onclick="copyToClipboard('git push origin main')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                    <code>git pull origin main</code> - Baixar atualizações
+                                    <button class="copy-btn" onclick="copyToClipboard('git pull origin main')" title="Copiar comando">📋</button>
+                                </li>
+                                <li><strong>Branches:</strong></li>
+                                <li class="git-command">
+                                    <code>git branch nome-branch</code> - Criar branch
+                                    <button class="copy-btn" onclick="copyToClipboard('git branch nome-branch')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                    <code>git checkout nome-branch</code> - Trocar branch
+                                    <button class="copy-btn" onclick="copyToClipboard('git checkout nome-branch')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                    <code>git merge nome-branch</code> - Fazer merge
+                                    <button class="copy-btn" onclick="copyToClipboard('git merge nome-branch')" title="Copiar comando">📋</button>
+                                </li>
+                                <li><strong>Status e Histórico:</strong></li>
+                                <li class="git-command">
+                                    <code>git status</code> - Ver status dos arquivos
+                                    <button class="copy-btn" onclick="copyToClipboard('git status')" title="Copiar comando">📋</button>
+                                </li>
+                                <li class="git-command">
+                                    <code>git log --oneline</code> - Ver histórico
+                                    <button class="copy-btn" onclick="copyToClipboard('git log --oneline')" title="Copiar comando">📋</button>
+                                </li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://git-scm.com/docs" target="_blank" class="tool-link tool-link-primary">
+                                    Documentação Git ↗
+                                </a>
+                                <a href="https://learngitbranching.js.org" target="_blank" class="tool-link">
+                                    Tutorial Interativo
+                                </a>
+                                <a href="https://github.com/git/git/blob/master/Documentation/giteveryday.txt" target="_blank" class="tool-link">
+                                    Git Everyday
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights">
+                        <div class="insights-icon">🔧</div>
+                        <h3>Melhor Prática</h3>
+                        <p>
+                            Use GitHub não apenas para código, mas como centro de comando do projeto. Configure branch protection, 
+                            use issues para planejamento, e aproveite Actions para automatizar testes e deploys. A documentação no README é crucial.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stage 3: IDEs -->
+                <div class="stage-card" id="stage-2" style="display: none;">
+                    <div class="stage-header">
+                        <div class="stage-icon">💻</div>
+                        <div class="stage-info">
+                            <h2>Ambientes de Desenvolvimento</h2>
+                            <p class="stage-description">IDEs modernas potencializadas com inteligência artificial</p>
+                            <p class="stage-subtitle">Etapa 3 • Codificação e Desenvolvimento</p>
+                        </div>
+                    </div>
+
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🎨</div>
+                                <div class="tool-name">VS Code</div>
+                            </div>
+                            <p class="tool-description">
+                                Editor de código mais popular do mundo com extenso ecossistema de extensões e integração Git
+                            </p>
+                            <ul class="tool-features">
+                                <li>IntelliSense avançado</li>
+                                <li>Debugging integrado</li>
+                                <li>Marketplace com 40k+ extensões</li>
+                                <li>Terminal integrado</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://code.visualstudio.com" target="_blank" class="tool-link tool-link-primary">
+                                    Baixar VS Code ↗
+                                </a>
+                                <a href="https://marketplace.visualstudio.com" target="_blank" class="tool-link">
+                                    Extensões
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🎯</div>
+                                <div class="tool-name">Cursor</div>
+                            </div>
+                            <p class="tool-description">
+                                IDE revolucionária com IA integrada para programação assistida e geração automática de código
+                            </p>
+                            <ul class="tool-features">
+                                <li>IA pair programming</li>
+                                <li>Autocompletar inteligente</li>
+                                <li>Geração de código contextual</li>
+                                <li>Refactoring automático</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://cursor.sh" target="_blank" class="tool-link tool-link-primary">
+                                    Baixar Cursor ↗
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🏄</div>
+                                <div class="tool-name">WindSurf</div>
+                            </div>
+                            <p class="tool-description">
+                                Editor de última geração da Codeium com recursos avançados de IA para desenvolvimento web
+                            </p>
+                            <ul class="tool-features">
+                                <li>Hot reload inteligente</li>
+                                <li>Preview em tempo real</li>
+                                <li>Otimização automática</li>
+                                <li>Integração com frameworks modernos</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://codeium.com/windsurf" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar WindSurf ↗
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🔧</div>
+                                <div class="tool-name">Trae.AI</div>
+                            </div>
+                            <p class="tool-description">
+                                Assistente de IA especializado em otimização, debugging e análise de performance de código
+                            </p>
+                            <ul class="tool-features">
+                                <li>Debugging automático</li>
+                                <li>Análise de performance</li>
+                                <li>Sugestões de otimização</li>
+                                <li>Code smell detection</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://trae.ai" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Trae.AI ↗
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights">
+                        <div class="insights-icon">⚡</div>
+                        <h3>Produtividade Máxima</h3>
+                        <p>
+                            IDEs com IA como Cursor podem aumentar sua produtividade em 10x. Configure snippets personalizados, 
+                            use atalhos de teclado e aproveite a geração automática de testes. WindSurf é ideal para projetos web com preview em tempo real.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stage 4: Assistentes Agênticos -->
+                <div class="stage-card" id="stage-3" style="display: none;">
+                    <div class="stage-header">
+                        <div class="stage-icon">🧠</div>
+                        <div class="stage-info">
+                            <h2>Assistentes Agênticos IA</h2>
+                            <p class="stage-description">Inteligência artificial avançada para desenvolvimento autônomo</p>
+                            <p class="stage-subtitle">Etapa 4 • Assistência e Automação</p>
+                        </div>
+                    </div>
+
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🤖</div>
+                                <div class="tool-name">Claude Code</div>
+                            </div>
+                            <p class="tool-description">
+                                Assistente de IA avançado da Anthropic para desenvolvimento, arquitetura e resolução de problemas complexos
+                            </p>
+                            <ul class="tool-features">
+                                <li>Análise de arquitetura de software</li>
+                                <li>Code review inteligente</li>
+                                <li>Debugging avançado</li>
+                                <li>Documentação automática</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://claude.ai" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Claude ↗
+                                </a>
+                                <a href="https://docs.anthropic.com" target="_blank" class="tool-link">
+                                    API Docs
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">✨</div>
+                                <div class="tool-name">Gemini Code</div>
+                            </div>
+                            <p class="tool-description">
+                                IA do Google especializada em programação, análise de código e integração com ecossistema Google Cloud
+                            </p>
+                            <ul class="tool-features">
+                                <li>Integração com Google Cloud</li>
+                                <li>Análise multimodal</li>
+                                <li>Geração de código otimizada</li>
+                                <li>Code explanation detalhada</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://gemini.google.com" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Gemini ↗
+                                </a>
+                                <a href="https://ai.google.dev" target="_blank" class="tool-link">
+                                    Developers
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">💬</div>
+                                <div class="tool-name">ChatGPT</div>
+                            </div>
+                            <p class="tool-description">
+                                Assistente OpenAI para resolução de problemas, geração de código e brainstorming técnico
+                            </p>
+                            <ul class="tool-features">
+                                <li>Code interpreter integrado</li>
+                                <li>Plugin ecosystem</li>
+                                <li>GPT-4 Turbo para código</li>
+                                <li>Custom GPTs especializados</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://chat.openai.com" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar ChatGPT ↗
+                                </a>
+                                <a href="https://platform.openai.com" target="_blank" class="tool-link">
+                                    API Platform
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-emoji">☁️</div>
+                                <div class="tool-name">Amazon Q</div>
+                            </div>
+                            <p class="tool-description">
+                                Assistente AWS especializado em desenvolvimento na nuvem, arquitetura e otimização de custos
+                            </p>
+                            <ul class="tool-features">
+                                <li>Expertise em AWS services</li>
+                                <li>Cost optimization insights</li>
+                                <li>Security best practices</li>
+                                <li>Infrastructure as Code</li>
+                            </ul>
+                            <div class="tool-links">
+                                <a href="https://aws.amazon.com/q" target="_blank" class="tool-link tool-link-primary">
+                                    Acessar Amazon Q ↗
+                                </a>
+                                <a href="https://docs.aws.amazon.com/amazonq" target="_blank" class="tool-link">
+                                    Documentação
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights">
+                        <div class="insights-icon">🚀</div>
+                        <h3>Futuro do Desenvolvimento</h3>
+                        <p>
+                            Assistentes agênticos não apenas respondem perguntas - eles podem arquitetar soluções completas, 
+                            escrever código de produção, fazer debugging complexo e otimizar performance. Use diferentes 
+                            IAs para diferentes especialidades: Claude para arquitetura, GPT para criatividade, Gemini para Google Cloud, 
+                            GLM 4-5 para tarefas técnicas complexas, e Qwen3 para otimização de código.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Seção de Segurança -->
+                <div class="stage-card" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-color: #ef4444; margin-top: 3rem;">
+                    <div class="stage-header">
+                        <div class="stage-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%)">🔒</div>
+                        <div class="stage-info">
+                            <h2 style="color: #991b1b;">Segurança no Desenvolvimento</h2>
+                            <p class="stage-description" style="color: #b91c1c;">Práticas essenciais para proteger dados sensíveis e código</p>
+                            <p class="stage-subtitle" style="color: #b91c1c;">Fundamental • Sempre verificar</p>
+                        </div>
+                    </div>
+
+                    <div class="tools-grid">
+                        <div class="tool-card" style="background: rgba(255, 255, 255, 0.9); border-color: #ef4444;">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🔐</div>
+                                <div class="tool-name" style="color: #991b1b;">Arquivo .env</div>
+                            </div>
+                            <p class="tool-description" style="color: #b91c1c;">
+                                <strong>NUNCA</strong> coloque dados sensíveis diretamente no código. Use sempre arquivos <code>.env</code> para armazenar chaves de API, senhas e tokens.
+                            </p>
+                            <ul class="tool-features">
+                                <li style="color: #b91c1c;"><strong>API Keys</strong> - Chaves de serviços externos</li>
+                                <li style="color: #b91c1c;"><strong>Tokens</strong> - Autenticação e autorização</li>
+                                <li style="color: #b91c1c;"><strong>Senhas</strong> - Banco de dados e serviços</li>
+                                <li style="color: #b91c1c;"><strong>URLs privadas</strong> - Endpoints internos</li>
+                            </ul>
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #ef4444;">
+                                <p style="color: #991b1b; font-size: 0.875rem; margin: 0;"><strong>Exemplo .env:</strong></p>
+                                <code style="display: block; margin-top: 0.5rem; font-family: monospace; background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 4px;">
+OPENAI_API_KEY=sk-proj-xxx...<br>
+DATABASE_URL=postgresql://user:pass@localhost:5432/db<br>
+JWT_SECRET=your-secret-key-here
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" style="background: rgba(255, 255, 255, 0.9); border-color: #ef4444;">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🚫</div>
+                                <div class="tool-name" style="color: #991b1b;">.gitignore</div>
+                            </div>
+                            <p class="tool-description" style="color: #b91c1c;">
+                                <strong>SEMPRE</strong> verifique se o arquivo <code>.env</code> está no <code>.gitignore</code> para não subir dados sensíveis para o repositório.
+                            </p>
+                            <ul class="tool-features">
+                                <li style="color: #b91c1c;"><strong>.env*</strong> - Todos os arquivos de ambiente</li>
+                                <li style="color: #b91c1c;"><strong>node_modules/</strong> - Dependências</li>
+                                <li style="color: #b91c1c;"><strong>*.log</strong> - Arquivos de log</li>
+                                <li style="color: #b91c1c;"><strong>dist/</strong> - Arquivos compilados</li>
+                            </ul>
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #ef4444;">
+                                <p style="color: #991b1b; font-size: 0.875rem; margin: 0;"><strong>Exemplo .gitignore:</strong></p>
+                                <code style="display: block; margin-top: 0.5rem; font-family: monospace; background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 4px;">
+# Variáveis de ambiente<br>
+.env<br>
+.env.local<br>
+.env.*.local<br><br>
+# Dependências<br>
+node_modules/<br><br>
+# Logs<br>
+*.log
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" style="background: rgba(255, 255, 255, 0.9); border-color: #ef4444;">
+                            <div class="tool-header">
+                                <div class="tool-emoji">🤖</div>
+                                <div class="tool-name" style="color: #991b1b;">Verificação por IA</div>
+                            </div>
+                            <p class="tool-description" style="color: #b91c1c;">
+                                <strong>SEMPRE</strong> peça para a IA verificar a segurança do código antes de fazer commit. IAs são excelentes para detectar vulnerabilidades.
+                            </p>
+                            <ul class="tool-features">
+                                <li style="color: #b91c1c;"><strong>Scan de segurança</strong> - Vulnerabilidades conhecidas</li>
+                                <li style="color: #b91c1c;"><strong>Dados expostos</strong> - Chaves e senhas no código</li>
+                                <li style="color: #b91c1c;"><strong>Validação de entrada</strong> - SQL injection, XSS</li>
+                                <li style="color: #b91c1c;"><strong>Permissões</strong> - Controle de acesso</li>
+                            </ul>
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #ef4444;">
+                                <p style="color: #991b1b; font-size: 0.875rem; margin: 0;"><strong>Prompt para IA:</strong></p>
+                                <p style="color: #991b1b; font-size: 0.875rem; margin-top: 0.5rem; font-style: italic;">
+                                    "Analise este código em busca de vulnerabilidades de segurança, dados sensíveis expostos e boas práticas não seguidas. Verifique se há chaves de API, senhas ou tokens hardcoded."
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="tool-card" style="background: rgba(255, 255, 255, 0.9); border-color: #ef4444;">
+                            <div class="tool-header">
+                                <div class="tool-emoji">📝</div>
+                                <div class="tool-name" style="color: #991b1b;">Código Comentado</div>
+                            </div>
+                            <p class="tool-description" style="color: #b91c1c;">
+                                Mantenha o código <strong>bem comentado</strong> e <strong>claro</strong> para evitar que a IA "alucine" e introduza bugs ou vulnerabilidades.
+                            </p>
+                            <ul class="tool-features">
+                                <li style="color: #b91c1c;"><strong>Funções documentadas</strong> - O que fazem e por quê</li>
+                                <li style="color: #b91c1c;"><strong>Variáveis claras</strong> - Nomes descritivos</li>
+                                <li style="color: #b91c1c;"><strong>Lógica explicada</strong> - Comentários em partes complexas</li>
+                                <li style="color: #b91c1c;"><strong>TODOs marcados</strong> - Melhorias futuras</li>
+                            </ul>
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #ef4444;">
+                                <p style="color: #991b1b; font-size: 0.875rem; margin: 0;"><strong>Exemplo de bom comentário:</strong></p>
+                                <code style="display: block; margin-top: 0.5rem; font-family: monospace; background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 4px;">
+// Valida e sanitiza entrada do usuário para prevenir XSS<br>
+function sanitizeInput(userInput) {<br>
+&nbsp;&nbsp;// Remove tags HTML perigosas<br>
+&nbsp;&nbsp;return userInput.replace(/&lt;script&gt;/gi, '');<br>
+}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-color: #ef4444;">
+                        <div class="insights-icon">⚠️</div>
+                        <h3 style="color: #991b1b;">Regra de Ouro da Segurança</h3>
+                        <p style="color: #b91c1c;">
+                            <strong>"Nunca confie, sempre verifique"</strong> - Mesmo com IA, sempre revise o código gerado. 
+                            Configure seu ambiente para detectar automaticamente dados sensíveis e use ferramentas como 
+                            <code>git-secrets</code> ou <code>truffleHog</code> para escanear repositórios. 
+                            <strong>Segurança não é opcional, é fundamental!</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="nav-btn" id="prevBtn" onclick="previousStage()">
+                    ← Anterior
+                </button>
+                
+                <div style="display: flex; gap: 0.5rem;">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary);" class="dot" data-stage="0"></div>
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--gray-300);" class="dot" data-stage="1"></div>
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--gray-300);" class="dot" data-stage="2"></div>
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--gray-300);" class="dot" data-stage="3"></div>
+                </div>
+                
+                <button class="nav-btn primary" id="nextBtn" onclick="nextStage()">
+                    Próximo →
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <button class="fab" onclick="scrollToTop()" title="Voltar ao topo">
+        ↑
+    </button>
+
+    <script>
+        let currentStage = 0;
+        const totalStages = 4;
+
+        function updateUI() {
+            // Update progress
+            const progress = ((currentStage + 1) / totalStages) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentStageNumber').textContent = currentStage + 1;
+
+            // Update stages visibility
+            for (let i = 0; i < totalStages; i++) {
+                const stage = document.getElementById(`stage-${i}`);
+                if (stage) {
+                    stage.style.display = i === currentStage ? 'block' : 'none';
+                }
+            }
+
+            // Update dots
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.style.background = index === currentStage ? 'var(--primary)' : 'var(--gray-300)';
+            });
+
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentStage === 0;
+            document.getElementById('nextBtn').disabled = currentStage === totalStages - 1;
+
+            // Update button text
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentStage === totalStages - 1) {
+                nextBtn.innerHTML = 'Finalizar ✓';
+            } else {
+                nextBtn.innerHTML = 'Próximo →';
+            }
+
+            // Smooth scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Add entrance animation to current stage
+            const currentStageEl = document.getElementById(`stage-${currentStage}`);
+            if (currentStageEl) {
+                currentStageEl.style.animation = 'none';
+                setTimeout(() => {
+                    currentStageEl.style.animation = 'slideIn 0.6s ease-out';
+                }, 50);
+            }
+        }
+
+        function nextStage() {
+            if (currentStage < totalStages - 1) {
+                currentStage++;
+                updateUI();
+                
+                // Button feedback
+                const btn = document.getElementById('nextBtn');
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => btn.style.transform = '', 150);
+            }
+        }
+
+        function previousStage() {
+            if (currentStage > 0) {
+                currentStage--;
+                updateUI();
+                
+                // Button feedback
+                const btn = document.getElementById('prevBtn');
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => btn.style.transform = '', 150);
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextStage();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousStage();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    currentStage = 0;
+                    updateUI();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    currentStage = totalStages - 1;
+                    updateUI();
+                    break;
+            }
+        });
+
+        // Scroll progress indicator
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scrollIndicator').style.width = scrolled + '%';
+        });
+
+        // Dot navigation
+        document.querySelectorAll('.dot').forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentStage = index;
+                updateUI();
+            });
+            dot.style.cursor = 'pointer';
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextStage(); // Swipe left = next
+                } else {
+                    previousStage(); // Swipe right = previous
+                }
+            }
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success feedback
+                const notification = document.createElement('div');
+                notification.textContent = 'Comando copiado!';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    z-index: 10000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    animation: slideIn 0.3s ease-out;
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const notification = document.createElement('div');
+                notification.textContent = 'Comando copiado!';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    z-index: 10000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 2000);
+            });
+        }
+
+        // Enhanced link interactions
+        document.querySelectorAll('.tool-link').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                // Preload link
+                const preloadLink = document.createElement('link');
+                preloadLink.rel = 'prefetch';
+                preloadLink.href = link.href;
+                document.head.appendChild(preloadLink);
+            });
+
+            link.addEventListener('click', (e) => {
+                // Add click effect
+                link.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    link.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Animate tool cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.animation = 'slideIn 0.6s ease-out forwards';
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        // Auto-hide FAB when at top
+        window.addEventListener('scroll', () => {
+            const fab = document.querySelector('.fab');
+            if (window.scrollY > 200) {
+                fab.style.opacity = '1';
+                fab.style.pointerEvents = 'all';
+            } else {
+                fab.style.opacity = '0';
+                fab.style.pointerEvents = 'none';
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            
+            // Observe tool cards for animations
+            document.querySelectorAll('.tool-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Add stagger animation to initial load
+            document.querySelectorAll('.tool-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Performance optimization: Debounce scroll events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Apply debounce to scroll events
+        window.addEventListener('scroll', debounce(() => {
+            // Scroll-based logic here
+        }, 10));
+
+        // Add loading states for better UX
+        function showLoading(element) {
+            element.classList.add('loading');
+            setTimeout(() => {
+                element.classList.remove('loading');
+            }, 300);
+        }
+
+        // Enhanced navigation with loading feedback
+        ['nextStage', 'previousStage'].forEach(funcName => {
+            const originalFunc = window[funcName];
+            window[funcName] = function() {
+                const container = document.getElementById('stageContainer');
+                showLoading(container);
+                return originalFunc.apply(this, arguments);
+            };
+        });
+    </script>
+</body>
+</html>
