@@ -872,7 +872,7 @@
                 </div>
 
                 <!-- Stage 2: Hospedagem de Código -->
-                <div class="stage-card" id="stage-1" style="display: none;">
+                <div class="stage-card" id="stage-1">
                     <div class="stage-header">
                         <div class="stage-icon">📚</div>
                         <div class="stage-info">
@@ -1048,7 +1048,7 @@
                 </div>
 
                 <!-- Stage 3: IDEs -->
-                <div class="stage-card" id="stage-2" style="display: none;">
+                <div class="stage-card" id="stage-2">
                     <div class="stage-header">
                         <div class="stage-icon">💻</div>
                         <div class="stage-info">
@@ -1158,7 +1158,7 @@
                 </div>
 
                 <!-- Stage 4: Assistentes Agênticos -->
-                <div class="stage-card" id="stage-3" style="display: none;">
+                <div class="stage-card" id="stage-3">
                     <div class="stage-header">
                         <div class="stage-icon">🧠</div>
                         <div class="stage-info">
@@ -1438,11 +1438,11 @@ function sanitizeInput(userInput) {<br>
             document.getElementById('progressFill').style.width = progress + '%';
             document.getElementById('currentStageNumber').textContent = currentStage + 1;
 
-            // Update stages visibility
+            // Show all stages (remove display none)
             for (let i = 0; i < totalStages; i++) {
                 const stage = document.getElementById(`stage-${i}`);
                 if (stage) {
-                    stage.style.display = i === currentStage ? 'block' : 'none';
+                    stage.style.display = 'block';
                 }
             }
 
@@ -1463,12 +1463,16 @@ function sanitizeInput(userInput) {<br>
                 nextBtn.innerHTML = 'Próximo →';
             }
 
-            // Smooth scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // Add entrance animation to current stage
+            // Smooth scroll to current stage
             const currentStageEl = document.getElementById(`stage-${currentStage}`);
             if (currentStageEl) {
+                currentStageEl.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                });
+                
+                // Add entrance animation
                 currentStageEl.style.animation = 'none';
                 setTimeout(() => {
                     currentStageEl.style.animation = 'slideIn 0.6s ease-out';
