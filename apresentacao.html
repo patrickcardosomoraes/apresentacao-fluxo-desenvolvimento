@@ -1483,8 +1483,10 @@ function sanitizeInput(userInput) {<br>
                 
                 // Button feedback
                 const btn = document.getElementById('nextBtn');
-                btn.style.transform = 'scale(0.95)';
-                setTimeout(() => btn.style.transform = '', 150);
+                if (btn) {
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => btn.style.transform = '', 150);
+                }
             }
         }
 
@@ -1495,8 +1497,10 @@ function sanitizeInput(userInput) {<br>
                 
                 // Button feedback
                 const btn = document.getElementById('prevBtn');
-                btn.style.transform = 'scale(0.95)';
-                setTimeout(() => btn.style.transform = '', 150);
+                if (btn) {
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => btn.style.transform = '', 150);
+                }
             }
         }
 
@@ -1506,9 +1510,15 @@ function sanitizeInput(userInput) {<br>
 
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+            
             switch(e.key) {
                 case 'ArrowRight':
                 case ' ':
+                case 'Spacebar': // For older browsers
                     e.preventDefault();
                     nextStage();
                     break;
@@ -1526,6 +1536,18 @@ function sanitizeInput(userInput) {<br>
                     currentStage = totalStages - 1;
                     updateUI();
                     break;
+            }
+        });
+        
+        // Alternative keyup listener for space bar (some browsers handle it differently)
+        document.addEventListener('keyup', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+            
+            if (e.code === 'Space' || e.keyCode === 32) {
+                e.preventDefault();
+                nextStage();
             }
         });
 
